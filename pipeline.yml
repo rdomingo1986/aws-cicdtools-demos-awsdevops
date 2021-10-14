@@ -1,0 +1,34 @@
+Resources:
+  CodeCommitRepository:
+    Type: AWS::CodeCommit::Repository
+    Properties: 
+      Code: 
+        BranchName: main
+        S3: 
+          Bucket: aws-ilt-courses
+          Key: angular-app.zip
+      RepositoryName: awsdevops-democodecommit
+      Tags: 
+        - Key: Demo
+          Value: AWS CI-CD Tools
+
+
+  CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties: 
+      Artifacts:
+        Location: awsdevops-demoartifacts
+        Packaging: ZIP
+        Type: S3
+      Environment: 
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:5.0
+        Type: LINUX_CONTAINER
+      Name: awsdevops-democodebuild
+      ServiceRole: !GetAtt SecurityStackCICDTools.Outputs.CodeBuildRoleArn
+      Source: 
+        Location: !GetAtt CodeCommitRepository.CloneUrlHttp
+        Type: CODECOMMIT
+      Tags: 
+        - Key: Demo
+          Value: AWS CI-CD Tools

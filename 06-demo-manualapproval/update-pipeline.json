@@ -1,0 +1,184 @@
+{
+  "pipeline": {
+      "name": "awsdevops-democodepipeline",
+      "roleArn": "arn:aws:iam::864613434505:role/CodePipelineBasicServiceRole",
+      "artifactStore": {
+        "type": "S3",
+        "location": "awsdevops-demoartifacts"
+      },
+      "stages": [
+          {
+              "name": "SourceStage",
+              "actions": [
+                  {
+                      "name": "CodeCommit",
+                      "actionTypeId": {
+                          "category": "Source",
+                          "owner": "AWS",
+                          "provider": "CodeCommit",
+                          "version": "1"
+                      },
+                      "runOrder": 1,
+                      "configuration": {
+                        "RepositoryName": "awsdevops-democodecommit",
+                        "BranchName": "master"
+                      },
+                      "outputArtifacts": [
+                          {
+                              "name": "SourceStageArtifact"
+                          }
+                      ],
+                      "region": "us-west-2"
+                  }
+              ]
+          },
+          {
+            "name": "BuildStage",
+            "actions": [
+                {
+                    "name": "CodeBuild",
+                    "actionTypeId": {
+                        "category": "Build",
+                        "owner": "AWS",
+                        "provider": "CodeBuild",
+                        "version": "1"
+                    },
+                    "runOrder": 1,
+                    "configuration": {
+                      "ProjectName": "awsdevops-democodebuild"
+                    },
+                    "outputArtifacts": [
+                        {
+                            "name": "BuildStageArtifact"
+                        }
+                    ],
+                    "inputArtifacts": [
+                        {
+                            "name": "SourceStageArtifact"
+                        }
+                    ],
+                    "region": "us-west-2"
+                },
+                {
+                    "name": "Notification",
+                    "actionTypeId": {
+                        "category": "Invoke",
+                        "owner": "AWS",
+                        "provider": "Lambda",
+                        "version": "1"
+                    },
+                    "runOrder": 1,
+                    "configuration": {
+                      "FunctionName": "awsdevops-democodepipeline"
+                    },
+                    "region": "us-west-2"
+                }
+            ]
+          },
+          {
+            "name": "DeployStage-Staging",
+            "actions": [
+                {
+                    "name": "CloudFormation",
+                    "actionTypeId": {
+                        "category": "Deploy",
+                        "owner": "AWS",
+                        "provider": "CloudFormation",
+                        "version": "1"
+                    },
+                    "runOrder": 1,
+                    "configuration": {
+                      "ActionMode": "CREATE_UPDATE",
+                      "Capabilities": "CAPABILITY_IAM",
+                      "RoleArn": "arn:aws:iam::864613434505:role/CloudFormationServiceRole",
+                      "StackName": "awsdevops-codedeploydemo-stage-stack",
+                      "TemplatePath": "BuildStageArtifact::instancia.yml"
+                    },
+                    "inputArtifacts": [
+                        {
+                            "name": "BuildStageArtifact"
+                        }
+                    ],
+                    "region": "us-west-2"
+                },
+                {
+                  "name": "CodeDeploy",
+                  "actionTypeId": {
+                      "category": "Deploy",
+                      "owner": "AWS",
+                      "provider": "CodeDeploy",
+                      "version": "1"
+                  },
+                  "runOrder": 2,
+                  "configuration": {
+                    "ApplicationName": "angular-web-app",
+                    "DeploymentGroupName": "angular-web-app-instances19-stage"
+                  },
+                  "inputArtifacts": [
+                      {
+                          "name": "BuildStageArtifact"
+                      }
+                  ],
+                  "region": "us-west-2"
+                },
+                {
+                    "name": "ManualApproval",
+                    "actionTypeId": {
+                        "category": "Approval",
+                        "owner": "AWS",
+                        "provider": "Manual",
+                        "version": "1"
+                    },
+                    "runOrder": 3,
+                    "configuration": {
+                        "CustomData": "Comments on the manual approval",
+                        "NotificationArn": "arn:aws:sns:us-west-2:864613434505:awsdevops-demonotifications"
+                    },
+                    "region": "us-west-2"
+                }
+            ]
+          },
+          {
+            "name": "DeployStage",
+            "actions": [
+                {
+                    "name": "CloudFormationDeletion",
+                    "actionTypeId": {
+                        "category": "Deploy",
+                        "owner": "AWS",
+                        "provider": "CloudFormation",
+                        "version": "1"
+                    },
+                    "runOrder": 1,
+                    "configuration": {
+                      "ActionMode": "DELETE_ONLY",
+                      "RoleArn": "arn:aws:iam::864613434505:role/CloudFormationServiceRole",
+                      "StackName": "awsdevops-codedeploydemo-stage-stack"
+                    },
+                    "region": "us-west-2"
+                },
+                {
+                  "name": "CodeDeploy",
+                  "actionTypeId": {
+                      "category": "Deploy",
+                      "owner": "AWS",
+                      "provider": "CodeDeploy",
+                      "version": "1"
+                  },
+                  "runOrder": 1,
+                  "configuration": {
+                    "ApplicationName": "angular-web-app",
+                    "DeploymentGroupName": "angular-web-app-instances19"
+                  },
+                  "inputArtifacts": [
+                      {
+                          "name": "BuildStageArtifact"
+                      }
+                  ],
+                  "region": "us-west-2"
+                }
+            ]
+          }
+      ]
+  }
+}

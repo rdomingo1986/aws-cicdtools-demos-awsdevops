@@ -1,0 +1,21 @@
+version: 0.2            
+phases:
+  install:
+    runtime-versions:
+      nodejs: 12.x
+    commands:
+      - apt-get update -y
+      - apt-get upgrade -y
+  pre_build:
+    commands:
+      - npm install
+  build:
+    commands:
+      - npm run build
+  post_build:
+    commands:
+      - echo 'DONE'
+artifacts:
+  files:
+    - '**/*'
+  base-directory: dist/angular

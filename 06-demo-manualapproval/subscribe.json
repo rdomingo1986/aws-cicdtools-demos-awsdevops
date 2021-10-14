@@ -1,0 +1,5 @@
+{
+  "TopicArn": "arn:aws:sns:us-west-2:864613434505:awsdevops-demonotifications",
+  "Protocol": "email",
+  "Endpoint": "domingo@allincloudservices.com"
+}

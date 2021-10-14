@@ -1,0 +1,23 @@
+{
+  "applicationName": "angular-web-app",
+  "deploymentGroupName": "angular-web-app-instances19-stage",
+  "deploymentConfigName": "CodeDeployDefault.OneAtATime",
+  "ec2TagFilters": [
+      {
+          "Key": "Environment",
+          "Value": "Stage",
+          "Type": "KEY_AND_VALUE"
+      }
+  ],
+  "serviceRoleArn": "arn:aws:iam::864613434505:role/CodeDeployBasicServiceRole",
+  "deploymentStyle": {
+      "deploymentType": "IN_PLACE",
+      "deploymentOption": "WITHOUT_TRAFFIC_CONTROL"
+  },
+  "tags": [
+    {
+      "Key": "Course",
+      "Value": "AWSDEVOPS"
+    }
+  ]
+}

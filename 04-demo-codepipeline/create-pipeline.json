@@ -1,0 +1,97 @@
+{
+  "pipeline": {
+      "name": "awsdevops-democodepipeline",
+      "roleArn": "arn:aws:iam::864613434505:role/CodePipelineBasicServiceRole",
+      "artifactStore": {
+          "type": "S3",
+          "location": "awsdevops-demoartifacts"
+      },
+      "stages": [
+          {
+              "name": "SourceStage",
+              "actions": [
+                  {
+                      "name": "CodeCommit",
+                      "actionTypeId": {
+                          "category": "Source",
+                          "owner": "AWS",
+                          "provider": "CodeCommit",
+                          "version": "1"
+                      },
+                      "runOrder": 1,
+                      "configuration": {
+                        "RepositoryName": "awsdevops-democodecommit",
+                        "BranchName": "master"
+                      },
+                      "outputArtifacts": [
+                          {
+                              "name": "SourceStageArtifact"
+                          }
+                      ],
+                      "region": "us-west-2"
+                  }
+              ]
+          },
+          {
+            "name": "BuildStage",
+            "actions": [
+                {
+                    "name": "CodeBuild",
+                    "actionTypeId": {
+                        "category": "Build",
+                        "owner": "AWS",
+                        "provider": "CodeBuild",
+                        "version": "1"
+                    },
+                    "runOrder": 1,
+                    "configuration": {
+                      "ProjectName": "awsdevops-democodebuild"
+                    },
+                    "outputArtifacts": [
+                        {
+                            "name": "BuildStageArtifact"
+                        }
+                    ],
+                    "inputArtifacts": [
+                        {
+                            "name": "SourceStageArtifact"
+                        }
+                    ],
+                    "region": "us-west-2"
+                }
+            ]
+          },
+          {
+            "name": "DeployStage",
+            "actions": [
+                {
+                    "name": "CodeDeploy",
+                    "actionTypeId": {
+                        "category": "Deploy",
+                        "owner": "AWS",
+                        "provider": "CodeDeploy",
+                        "version": "1"
+                    },
+                    "runOrder": 1,
+                    "configuration": {
+                      "ApplicationName": "angular-web-app",
+                      "DeploymentGroupName": "angular-web-app-instances19"
+                    },
+                    "inputArtifacts": [
+                        {
+                            "name": "BuildStageArtifact"
+                        }
+                    ],
+                    "region": "us-west-2"
+                }
+            ]
+          }
+      ]
+  },
+  "tags": [
+      {
+          "key": "Course",
+          "value": "AWSDEVOPS"
+      }
+  ]
+}

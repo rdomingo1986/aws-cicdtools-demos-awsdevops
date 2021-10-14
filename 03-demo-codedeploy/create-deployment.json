@@ -1,0 +1,12 @@
+{
+  "applicationName": "angular-web-app",
+  "deploymentGroupName": "angular-web-app-instance19",
+  "revision": {
+      "revisionType": "S3",
+      "s3Location": {
+          "bucket": "awsdevops-demoartifacts",
+          "key": "awsdevops-democodebuild",
+          "bundleType": "zip"
+      }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "applicationName": "angular-web-app",
+  "computePlatform": "Server",
+  "tags": [
+    {
+      "Key": "Course",
+      "Value": "AWSDEVOPS"
+    }
+  ]
+}
